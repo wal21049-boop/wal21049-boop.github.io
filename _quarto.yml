@@ -1,5 +1,7 @@
 project: 
   type: website
+  resources:
+    - larkspur-case/index.html
 
 website:
   title: "Your_Name - Data Science Portfolio"
