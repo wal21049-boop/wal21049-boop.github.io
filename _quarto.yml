@@ -3,6 +3,7 @@ project:
   resources:
     - larkspur-case/index.html
     - prospecting-portfolio/index.html
+    - project-summit/index.html
 
 website:
   title: "Your_Name - Data Science Portfolio"
