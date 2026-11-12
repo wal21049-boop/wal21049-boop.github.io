@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Summit — Sell-Side M&amp;A Case Challenge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#8f1d21; --navy-2:#6f1518; --ink:#222222; --muted:#5f5f5f; --line:#e1dcdc;
+    --paper:#f7f5f5; --card:#ffffff; --copper:#b0262c; --copper-soft:#f7e4e4; --dark:#2b2b2b;
+    --green:#2f7a4f; --green-soft:#e2f1e7; --red:#a83a32; --red-soft:#f7e2df; --amber-soft:#fbf1d9;
+    --radius:10px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth; scroll-padding-top:70px}
+  body{margin:0; background:var(--paper); color:var(--ink); font:16px/1.6 "IBM Plex Sans",system-ui,sans-serif; -webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-family:"Newsreader",Georgia,serif; color:var(--navy); line-height:1.15; margin:0 0 .5em}
+  h2{font-size:2rem; font-weight:600}
+  h3{font-size:1.3rem; font-weight:600}
+  p{margin:0 0 1em}
+  .num,td.n,th.n{font-variant-numeric:tabular-nums}
+  .wrap{max-width:1040px; margin:0 auto; padding:0 24px}
+
+  /* nav */
+  nav.top{position:sticky; top:0; z-index:20; background:rgba(43,43,43,.97); backdrop-filter:blur(6px)}
+  nav.top .wrap{display:flex; gap:4px; align-items:center; overflow-x:auto; scrollbar-width:none; padding-top:10px; padding-bottom:10px}
+  nav.top .brand{color:#fff; font-family:"Newsreader",serif; font-weight:600; font-size:1.1rem; margin-right:14px; white-space:nowrap}
+  nav.top a{color:#d9d4d4; text-decoration:none; font-size:.86rem; font-weight:500; padding:6px 10px; border-radius:6px; white-space:nowrap}
+  nav.top a:hover{background:rgba(255,255,255,.1); color:#fff}
+  nav.top a.cta{background:var(--copper); color:#fff; margin-left:auto}
+
+  /* hero */
+  header.hero{background:var(--navy); color:#f6e9e9; padding:72px 0 64px; position:relative; overflow:hidden}
+  header.hero::after{content:""; position:absolute; right:-120px; top:-60px; width:520px; height:520px; border-radius:50%;
+    background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.12), rgba(255,255,255,0) 65%)}
+  .eyebrow{font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; color:var(--copper); font-weight:600}
+  header.hero .eyebrow{color:#f3c5c5}
+  header.hero h1{color:#fff; font-size:clamp(2.6rem,6vw,4.4rem); font-weight:600; margin:.25em 0 .2em; position:relative; z-index:1}
+  header.hero .sub{font-size:1.2rem; max-width:640px; color:#f1dcdc; position:relative; z-index:1}
+  .hero-meta{display:flex; flex-wrap:wrap; gap:10px 28px; margin-top:28px; font-size:.95rem; position:relative; z-index:1}
+  .hero-meta b{color:#fff; font-weight:600}
+  .hero-q{margin-top:36px; display:grid; grid-template-columns:repeat(4,1fr); gap:12px; position:relative; z-index:1}
+  .hero-q div{border:1px solid rgba(255,255,255,.16); border-radius:var(--radius); padding:14px 16px; background:rgba(255,255,255,.04)}
+  .hero-q span{display:block; font-family:"IBM Plex Mono",monospace; color:#f3c5c5; font-size:.8rem}
+  .hero-q strong{color:#fff; font-weight:500; font-size:.98rem; line-height:1.35; display:block; margin-top:4px}
+
+  section{padding:64px 0; border-bottom:1px solid var(--line)}
+  section .lead{font-size:1.08rem; color:var(--muted); max-width:720px}
+
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:24px}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+  .grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:18px}
+
+  /* schedule */
+  .timeline{list-style:none; margin:24px 0 0; padding:0; border-left:2px solid var(--line)}
+  .timeline li{position:relative; padding:0 0 18px 26px}
+  .timeline li::before{content:""; position:absolute; left:-7px; top:7px; width:12px; height:12px; border-radius:50%; background:var(--card); border:2px solid var(--copper)}
+  .timeline li.key::before{background:var(--copper)}
+  .timeline time{font-family:"IBM Plex Mono",monospace; font-size:.85rem; color:var(--copper); display:block}
+  .timeline b{color:var(--navy)}
+  .timeline span{color:var(--muted); font-size:.95rem}
+
+  /* memo */
+  .memo{background:var(--card); border:1px solid var(--line); border-top:4px solid var(--navy); border-radius:var(--radius); padding:28px 32px; margin-top:24px}
+  .memo dl{display:grid; grid-template-columns:90px 1fr; gap:4px 12px; margin:0 0 18px; font-size:.92rem; padding-bottom:16px; border-bottom:1px solid var(--line)}
+  .memo dt{color:var(--muted); text-transform:uppercase; font-size:.75rem; letter-spacing:.08em; padding-top:3px}
+  .memo dd{margin:0; font-weight:500}
+  ol.goals{padding-left:1.2em; margin:0}
+  ol.goals li{margin-bottom:6px}
+
+  .deliv{counter-reset:d; display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-top:24px}
+  .deliv div{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:16px; counter-increment:d}
+  .deliv div::before{content:counter(d); font-family:"Newsreader",serif; font-size:2rem; color:var(--copper); font-weight:600; display:block; line-height:1}
+  .deliv b{display:block; color:var(--navy); margin:8px 0 4px}
+  .deliv p{font-size:.88rem; color:var(--muted); margin:0}
+
+  /* tables */
+  table{border-collapse:collapse; width:100%; font-size:.94rem}
+  th,td{padding:9px 12px; text-align:left; border-bottom:1px solid var(--line); vertical-align:top}
+  thead th{font-size:.74rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:600; border-bottom:2px solid var(--navy)}
+  td.n,th.n{text-align:right; white-space:nowrap}
+  tr.sub td{font-weight:600; border-top:1px solid #b9b2a3}
+  tr.total td{font-weight:700; color:var(--navy); border-top:2px solid var(--navy); border-bottom:3px double var(--navy)}
+  tr.indent td:first-child{padding-left:28px; color:#3c4656}
+  .table-wrap{overflow-x:auto; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:6px 10px}
+
+  .exhibit{margin-top:44px}
+  .ex-label{display:inline-block; background:var(--copper); color:#fff; font-size:.72rem; font-weight:600; letter-spacing:.12em; text-transform:uppercase; padding:4px 10px; border-radius:4px; margin-bottom:10px}
+  .note{font-size:.85rem; color:var(--muted); margin-top:10px}
+
+  .notes{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:8px}
+  .notes .card{padding:18px 20px}
+  .notes h4{margin:0 0 6px; font-size:.98rem; color:var(--navy)}
+  .notes .tag{font-family:"IBM Plex Mono",monospace; font-size:.75rem; color:var(--copper)}
+  .notes p{font-size:.92rem; margin:0}
+  table.mini{font-size:.86rem; margin-top:6px}
+  table.mini td,table.mini th{padding:5px 6px}
+  .quote{font-size:.86rem !important; color:#444; border-left:3px solid var(--line); padding-left:10px; margin-top:10px !important; font-style:italic}
+
+  .offers{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+  .offer{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden}
+  .offer header{padding:18px 22px; background:var(--dark); color:#fff}
+  .offer header .eyebrow{color:#f3a5a5}
+  .offer header h3{color:#fff; margin:4px 0 2px}
+  .offer header .head{font-family:"Newsreader",serif; font-size:2.2rem; font-weight:600}
+  .offer header small{color:#d9d4d4}
+  .offer table td:first-child{color:var(--muted); width:44%}
+  .offer .pad{padding:8px 14px 14px}
+
+  .roles td:first-child{font-weight:600; color:var(--navy); white-space:nowrap}
+  .pill{display:inline-block; font-size:.74rem; padding:2px 9px; border-radius:20px; background:var(--copper-soft); color:#7a1519; font-weight:600}
+
+  /* worksheet */
+  #worksheet{background:#efeaea}
+  .step{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:24px 26px; margin-top:22px}
+  .step h3 .k{font-family:"IBM Plex Mono",monospace; font-size:.8rem; color:var(--copper); display:block; letter-spacing:.06em}
+  .step .hint{font-size:.9rem; color:var(--muted)}
+  .row{display:grid; grid-template-columns:1fr 170px; gap:10px; align-items:center; padding:7px 0; border-bottom:1px solid #eee9df}
+  .row label{font-size:.95rem}
+  input[type=number],input[type=text]{font:inherit; font-variant-numeric:tabular-nums; width:100%; padding:7px 10px; border:1px solid #c9c2b4; border-radius:6px; background:#fffdf9; text-align:right}
+  input[type=text].desc{text-align:left}
+  input:focus{outline:2px solid var(--copper); outline-offset:1px; border-color:var(--copper)}
+  .result{display:flex; justify-content:space-between; align-items:baseline; margin-top:14px; padding:14px 16px; background:var(--dark); color:#fff; border-radius:8px}
+  .result b{font-family:"Newsreader",serif; font-size:1.6rem; font-weight:600}
+  .adj{display:grid; grid-template-columns:1fr 110px 170px; gap:10px; align-items:center; padding:9px 0; border-bottom:1px solid #eee9df}
+  .seg{display:inline-flex; justify-self:end; border:1px solid #c9c2b4; border-radius:7px; overflow:hidden}
+  .seg button{font:inherit; font-size:.82rem; font-weight:600; border:0; background:#fffdf9; padding:6px 12px; cursor:pointer; color:var(--muted)}
+  .seg button+button{border-left:1px solid #c9c2b4}
+  .seg button.on.acc{background:var(--green); color:#fff}
+  .seg button.on.rej{background:var(--red); color:#fff}
+  .custom{display:grid; grid-template-columns:1fr 170px; gap:10px; padding:7px 0}
+  .slider{width:100%; accent-color:var(--copper)}
+  .mult-big{font-family:"Newsreader",serif; font-size:2.4rem; color:var(--navy); font-weight:600}
+  .cmp td.n{font-weight:500}
+  .cmp tr.total td{font-size:1.05rem}
+  .btns{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px}
+  .btn{font:inherit; font-weight:600; font-size:.92rem; border:0; padding:10px 18px; border-radius:8px; cursor:pointer; background:var(--copper); color:#fff}
+  .btn.ghost{background:transparent; color:var(--navy); border:1px solid var(--navy)}
+  .toast{font-size:.88rem; color:var(--green); align-self:center}
+  textarea{font:inherit; width:100%; min-height:72px; padding:10px; border:1px solid #c9c2b4; border-radius:6px; background:#fffdf9; resize:vertical}
+
+  .callout{border-left:4px solid var(--copper); background:var(--copper-soft); padding:14px 18px; border-radius:0 8px 8px 0; margin:18px 0; font-size:.95rem}
+  .gloss{display:grid; grid-template-columns:1fr 1fr; gap:0 32px}
+  .gloss div{padding:12px 0; border-bottom:1px solid var(--line)}
+  .gloss b{color:var(--navy)}
+  .gloss p{margin:2px 0 0; font-size:.92rem; color:#3c4656}
+
+  footer{padding:40px 0 60px; color:var(--muted); font-size:.85rem}
+
+  @media (max-width:860px){
+    .grid2,.grid3,.notes,.offers,.gloss{grid-template-columns:1fr}
+    .deliv{grid-template-columns:1fr 1fr}
+    .hero-q{grid-template-columns:1fr 1fr}
+    .adj{grid-template-columns:1fr; gap:6px}
+    .row,.custom{grid-template-columns:1fr 130px}
+    .memo{padding:22px 20px}
+  }
+  @media print{
+    nav.top,.btns,#worksheet .slider{display:none}
+    body{background:#fff; font-size:11pt}
+    header.hero{background:#fff; color:#000; padding:20px 0}
+    header.hero h1,header.hero .sub,.hero-meta b{color:#000}
+    header.hero::after{display:none}
+    .hero-q div{border-color:#999}
+    .hero-q strong{color:#000}
+    section{padding:24px 0; break-inside:auto}
+    .exhibit,.step,.offer,.card{break-inside:avoid}
+    .offer header{background:#fff; color:#000; border-bottom:2px solid #000}
+    .offer header h3,.offer header .head{color:#000}
+    .result{background:#fff; color:#000; border:2px solid #000}
+  }
+</style>
+</head>
+<body>
+
+<nav class="top" aria-label="Sections">
+  <div class="wrap">
+    <span class="brand">Project Summit</span>
+    <a href="#schedule">Schedule</a>
+    <a href="#engagement">Engagement</a>
+    <a href="#company">Company</a>
+    <a href="#exhibits">Exhibits</a>
+    <a href="#offers">Offers</a>
+    <a href="#judging">Judging</a>
+    <a href="#glossary">Glossary</a>
+    <a href="#worksheet" class="cta">Team worksheet</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">BYU–Idaho Student Accounting Society &nbsp;×&nbsp; Hemming Morse, LLP</div>
+    <h1>Project Summit</h1>
+    <p class="sub">A sell-side M&amp;A case challenge. The owners of a profitable Idaho manufacturer want to sell, and two buyers are at the table. Your team advises the sellers.</p>
+    <div class="hero-meta">
+      <div><b>Thursday, November 12, 2026</b></div>
+      <div>Work session <b>6:00 PM</b></div>
+      <div>Presentations <b>7:45 PM</b></div>
+      <div>Teams of <b>3–5</b></div>
+    </div>
+    <div class="hero-q">
+      <div><span>Q1</span><strong>What does Summit really earn? (Adjusted EBITDA)</strong></div>
+      <div><span>Q2</span><strong>What is the company worth?</strong></div>
+      <div><span>Q3</span><strong>Which offer is actually better?</strong></div>
+      <div><span>Q4</span><strong>What should the sellers negotiate before signing?</strong></div>
+    </div>
+  </div>
+</header>
+
+<!-- SCHEDULE -->
+<section id="schedule">
+  <div class="wrap grid2">
+    <div>
+      <div class="eyebrow">Tonight</div>
+      <h2>Schedule</h2>
+      <p class="lead">You have about 95 minutes of working time. The times below are a suggested pace. Professionals from Hemming Morse arrive at 7:30, and presentations start at 7:45.</p>
+      <div class="callout"><b>Nobody is expected to know everything.</b> The case has work for every level of experience. A freshman who spots a questionable expense helps as much as a senior who works out what it does to the price.</div>
+    </div>
+    <ol class="timeline">
+      <li><time>6:00 – 6:10</time><b>Kickoff</b><br><span>Case introduction, form teams, open this page.</span></li>
+      <li><time>6:10 – 6:25</time><b>Read the case and assign roles</b><br><span>Skim the memo and exhibits, then split up the work.</span></li>
+      <li><time>6:25 – 6:55</time><b>Quality of earnings</b><br><span>Rebuild reported EBITDA, then accept or reject each adjustment (Worksheet Steps 1–2).</span></li>
+      <li><time>6:55 – 7:10</time><b>Valuation</b><br><span>Choose and defend a multiple (Step 3).</span></li>
+      <li class="key"><time>~7:05</time><b>Deal update</b><br><span>Each team receives a sealed envelope. Open it only when the organizers tell you to.</span></li>
+      <li><time>7:05 – 7:25</time><b>Compare the offers</b><br><span>Calculate the risk-adjusted value of each offer, including anything in the update (Step 4).</span></li>
+      <li class="key"><time>7:25 – 7:45</time><b>Build your recommendation</b><br><span>The professionals arrive at 7:30. Finish your talking points.</span></li>
+      <li class="key"><time>7:45 →</time><b>Presentations</b><br><span>5 minutes per team, plus 3 minutes of judges' questions.</span></li>
+      <li><time>After</time><b>Judging and debrief</b><br><span>Hemming Morse walks through how they would approach the deal.</span></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ENGAGEMENT -->
+<section id="engagement">
+  <div class="wrap">
+    <div class="eyebrow">Your role</div>
+    <h2>The engagement</h2>
+    <p class="lead">Your team is the junior sell-side advisory team on this engagement. You work for the sellers, so your job is to get the owners the best deal. That means the <em>best</em> deal, which may not be the biggest number.</p>
+
+    <div class="memo">
+      <dl>
+        <dt>To</dt><dd>Junior advisory teams</dd>
+        <dt>From</dt><dd>Engagement lead, Sell-Side Advisory</dd>
+        <dt>Re</dt><dd>Project Summit: sale of Summit Manufacturing, Inc.</dd>
+        <dt>Status</dt><dd>Two non-binding letters of intent (LOIs) received. Client decision needed this week.</dd>
+      </dl>
+      <p>Summit's co-founders, <b>Mark Hansen</b> and <b>Dave Ortiz</b>, have run the company for 15 years and are ready to retire. They put out a draft Confidential Information Memorandum (CIM) prepared by their internal team, which shows <b>Adjusted EBITDA of $2.15 million</b>. Two buyers responded with LOIs, and both based their price on that $2.15M figure.</p>
+      <p>Both LOIs are subject to each buyer's own Quality of Earnings review. Before we advise Mark and Dave, we need our own defensible view of earnings, value, and which offer to take. Deals move fast, so expect new information before the night is over.</p>
+      <p style="margin-bottom:.5em"><b>What the owners told us matters, in order:</b></p>
+      <ol class="goals">
+        <li><b>Retire.</b> Both want to be fully out of the business within about 12 months.</li>
+        <li><b>Certainty.</b> "We only want to go through this once." A deal that falls apart late would be very costly.</li>
+        <li><b>Maximize what they actually receive</b>, not the headline number.</li>
+        <li><b>Take care of their people.</b> Many of their 86 employees have been with them for over a decade.</li>
+      </ol>
+    </div>
+
+    <h3 style="margin-top:44px">What your team delivers</h3>
+    <div class="deliv">
+      <div><b>Adjusted EBITDA</b><p>Your supported view of what Summit earns, and whether that number holds under each buyer's terms.</p></div>
+      <div><b>Valuation</b><p>Pick an EBITDA multiple and a value range, and defend them.</p></div>
+      <div><b>Offer comparison</b><p>What each offer is worth to the owners today, including the 7:05 update.</p></div>
+      <div><b>Recommendation</b><p>Pick a buyer (or a counteroffer) and name 2–3 specific terms to negotiate.</p></div>
+      <div><b>Key risks</b><p>The top risks to value or to closing, and how to handle each one.</p></div>
+    </div>
+    <p class="note">Presentation format: 5 minutes, any format. Slides, a one-pager, or a whiteboard all work. Speak to the judges as if they were Mark and Dave. Be ready for questions like <em>"Why shouldn't we just take the highest offer?"</em></p>
+
+    <h3 style="margin-top:40px">Suggested team roles</h3>
+    <p class="hint" style="color:var(--muted)">Teams of 3–4 can combine roles. Everyone should understand the final recommendation.</p>
+    <div class="table-wrap">
+      <table class="roles">
+        <thead><tr><th>Role</th><th>Owns</th><th>Good fit for</th></tr></thead>
+        <tbody>
+          <tr><td>Lead advisor</td><td>Keeps time, pulls the story together, and leads the presentation.</td><td><span class="pill">Any level</span></td></tr>
+          <tr><td>Financial analyst</td><td>Exhibit A: rebuilds reported EBITDA from the income statement (Step 1).</td><td><span class="pill">Freshman / sophomore</span></td></tr>
+          <tr><td>QoE analyst</td><td>Exhibits B and C: tests each adjustment against the data room (Step 2).</td><td><span class="pill">Intermediate+</span></td></tr>
+          <tr><td>Valuation analyst</td><td>Exhibit D: chooses and defends the multiple (Step 3).</td><td><span class="pill">Intermediate</span></td></tr>
+          <tr><td>Deal analyst</td><td>Exhibits E and F: compares the offers and drafts negotiation asks (Step 4).</td><td><span class="pill">Any level</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- COMPANY -->
+<section id="company">
+  <div class="wrap">
+    <div class="eyebrow">Target</div>
+    <h2>Summit Manufacturing, Inc.</h2>
+    <div class="grid2" style="margin-top:20px">
+      <div>
+        <p>Summit is a privately held <b>custom steel fabrication and machining</b> company in eastern Idaho, founded in 2011. It makes structural components, brackets, frames, and weldments for <b>agricultural equipment makers</b> (about 60% of revenue) and <b>commercial construction contractors</b> (about 40%).</p>
+        <p>The company has grown about <b>12% a year</b> for three years, with steady gross margins near 40%. Mark Hansen runs sales and owns the key customer relationships. Dave Ortiz runs operations and the shop floor.</p>
+        <p>Summit is an <b>S corporation</b>, so it pays no entity-level income tax. Profits pass through to the owners' personal returns.</p>
+      </div>
+      <div class="grid2" style="gap:12px; align-content:start">
+        <div class="card"><div class="eyebrow">FY2026 revenue</div><div class="mult-big">$12.0M</div></div>
+        <div class="card"><div class="eyebrow">Employees</div><div class="mult-big">86</div></div>
+        <div class="card"><div class="eyebrow">3-yr growth</div><div class="mult-big">~12%</div></div>
+        <div class="card"><div class="eyebrow">Backlog</div><div class="mult-big">$4.1M</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXHIBITS -->
+<section id="exhibits">
+  <div class="wrap">
+    <div class="eyebrow">Data room</div>
+    <h2>Exhibits</h2>
+    <p class="lead">Summit's fiscal year ends September 30. All figures are in U.S. dollars and illustrative. This case and the company are fictional.</p>
+
+    <div class="exhibit">
+      <span class="ex-label">Exhibit A</span>
+      <h3>Financial performance</h3>
+      <div class="grid2">
+        <div>
+          <p class="note" style="margin:0 0 8px"><b>A-1. Three-year summary</b></p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Fiscal year</th><th class="n">FY2024</th><th class="n">FY2025</th><th class="n">FY2026</th></tr></thead>
+              <tbody>
+                <tr><td>Revenue</td><td class="n">9,570,000</td><td class="n">10,710,000</td><td class="n">12,000,000</td></tr>
+                <tr><td>Revenue growth</td><td class="n">—</td><td class="n">11.9%</td><td class="n">12.0%</td></tr>
+                <tr><td>Gross margin</td><td class="n">39.2%</td><td class="n">40.6%</td><td class="n">40.0%</td></tr>
+                <tr><td>Reported EBITDA</td><td class="n">1,480,000</td><td class="n">1,680,000</td><td class="n">?</td></tr>
+                <tr><td>Customers ≥ 10% of revenue</td><td class="n">1</td><td class="n">1</td><td class="n">1</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="note">FY2026 reported EBITDA is left blank on purpose. Calculate it from A-2 in Worksheet Step 1.</p>
+        </div>
+        <div>
+          <p class="note" style="margin:0 0 8px"><b>A-2. FY2026 income statement (year ended Sept 30, 2026)</b></p>
+          <div class="table-wrap">
+            <table>
+              <tbody>
+                <tr><td>Revenue</td><td class="n">12,000,000</td></tr>
+                <tr><td>Cost of goods sold</td><td class="n">(7,200,000)</td></tr>
+                <tr class="sub"><td>Gross profit</td><td class="n">4,800,000</td></tr>
+                <tr><td colspan="2" style="color:var(--muted); font-size:.8rem; text-transform:uppercase; letter-spacing:.08em; padding-top:14px">Operating expenses</td></tr>
+                <tr class="indent"><td>Office &amp; administrative salaries</td><td class="n">1,150,000</td></tr>
+                <tr class="indent"><td>Owner compensation (2 owners, incl. benefits)</td><td class="n">520,000</td></tr>
+                <tr class="indent"><td>Sales &amp; marketing (incl. trade shows)</td><td class="n">310,000</td></tr>
+                <tr class="indent"><td>Repairs &amp; maintenance</td><td class="n">210,000</td></tr>
+                <tr class="indent"><td>Professional fees (legal &amp; accounting)</td><td class="n">165,000</td></tr>
+                <tr class="indent"><td>Facility rent</td><td class="n">155,000</td></tr>
+                <tr class="indent"><td>Utilities &amp; other G&amp;A</td><td class="n">155,000</td></tr>
+                <tr class="indent"><td>Insurance</td><td class="n">140,000</td></tr>
+                <tr class="indent"><td>Travel &amp; entertainment</td><td class="n">95,000</td></tr>
+                <tr class="indent"><td>Depreciation</td><td class="n">250,000</td></tr>
+                <tr class="indent"><td>Amortization</td><td class="n">50,000</td></tr>
+                <tr class="sub"><td>Total operating expenses</td><td class="n">(3,200,000)</td></tr>
+                <tr class="sub"><td>Operating income</td><td class="n">1,600,000</td></tr>
+                <tr><td>Interest expense</td><td class="n">(100,000)</td></tr>
+                <tr><td>Income tax expense (S corporation)</td><td class="n">0</td></tr>
+                <tr class="total"><td>Net income</td><td class="n">1,500,000</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exhibit">
+      <span class="ex-label">Exhibit B</span>
+      <h3>Management's proposed EBITDA adjustments (from the draft CIM)</h3>
+      <p>Management added these items back to reported EBITDA to arrive at the <b>$2.15M</b> Adjusted EBITDA the buyers saw. An add-back means management says the expense <em>will not continue under a new owner</em>.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Proposed add-back</th><th>Management's explanation</th><th class="n">Amount</th></tr></thead>
+          <tbody>
+            <tr><td>B1</td><td>Excess owner compensation</td><td>"The two of us are paid more than replacement managers would cost."</td><td class="n">120,000</td></tr>
+            <tr><td>B2</td><td>Hollis lawsuit legal fees</td><td>"One-time legal costs on a lawsuit that is now settled."</td><td class="n">40,000</td></tr>
+            <tr><td>B3</td><td>Owners' personal travel</td><td>"Family trips that ran through the company card."</td><td class="n">25,000</td></tr>
+            <tr><td>B4</td><td>Press brake overhaul</td><td>"A one-time major repair on our largest press brake."</td><td class="n">30,000</td></tr>
+            <tr><td>B5</td><td>Trade show costs</td><td>"Discretionary spending a new owner could cut."</td><td class="n">35,000</td></tr>
+            <tr class="total"><td></td><td colspan="2">Total proposed add-backs</td><td class="n">250,000</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="exhibit">
+      <span class="ex-label">Exhibit C</span>
+      <h3>Data room documents</h3>
+      <p>Excerpts from the virtual data room. What they mean for earnings and value is for your team to decide.</p>
+      <div class="notes">
+        <div class="card"><span class="tag">C1 · Payroll register &amp; 2026 regional compensation survey</span><h4>Executive compensation</h4>
+          <table class="mini"><thead><tr><th>Person / role</th><th class="n">Annual cost incl. benefits</th></tr></thead><tbody>
+          <tr><td>Mark Hansen, co-founder (sales)</td><td class="n">260,000</td></tr>
+          <tr><td>Dave Ortiz, co-founder (operations)</td><td class="n">260,000</td></tr>
+          <tr><td><i>Survey median: President / GM, $10–20M manufacturer</i></td><td class="n"><i>230,000</i></td></tr>
+          <tr><td><i>Survey median: VP Operations, $10–20M manufacturer</i></td><td class="n"><i>170,000</i></td></tr>
+          </tbody></table></div>
+        <div class="card"><span class="tag">C2 · Professional fees GL + outside counsel letter</span><h4>Professional fees, FY2026</h4>
+          <table class="mini"><tbody>
+          <tr><td>Hollis Distributing v. Summit (contract dispute)</td><td class="n">40,000</td></tr>
+          <tr><td>Annual financial statement review</td><td class="n">68,000</td></tr>
+          <tr><td>Tax preparation</td><td class="n">32,000</td></tr>
+          <tr><td>General corporate legal</td><td class="n">25,000</td></tr>
+          <tr class="sub"><td>Total</td><td class="n">165,000</td></tr>
+          </tbody></table>
+          <p class="quote">"The Hollis matter was settled and dismissed on January 14, 2026. We are not aware of any other pending or threatened claims against the Company." (Outside counsel, Oct. 2026)</p></div>
+        <div class="card"><span class="tag">C3 · Travel &amp; entertainment GL, FY2026</span><h4>T&amp;E detail</h4>
+          <table class="mini"><tbody>
+          <tr><td>Customer site visits</td><td class="n">48,000</td></tr>
+          <tr><td>Supplier &amp; industry travel</td><td class="n">22,000</td></tr>
+          <tr><td>Hansen family, Maui (March)</td><td class="n">14,000</td></tr>
+          <tr><td>Ortiz family, Orlando (July)</td><td class="n">11,000</td></tr>
+          <tr class="sub"><td>Total</td><td class="n">95,000</td></tr>
+          </tbody></table></div>
+        <div class="card"><span class="tag">C4 · Maintenance log, items over $10,000</span><h4>Repairs &amp; maintenance</h4>
+          <table class="mini"><thead><tr><th>Year</th><th>Item</th><th class="n">Cost</th></tr></thead><tbody>
+          <tr><td>FY2024</td><td>Press brake #2, full overhaul</td><td class="n">31,000</td></tr>
+          <tr><td>FY2024</td><td>Laser cutter head replacement</td><td class="n">18,000</td></tr>
+          <tr><td>FY2025</td><td>Press brake #1, full overhaul</td><td class="n">28,000</td></tr>
+          <tr><td>FY2025</td><td>Shop HVAC compressor</td><td class="n">12,000</td></tr>
+          <tr><td>FY2026</td><td>Press brake #2, full overhaul</td><td class="n">30,000</td></tr>
+          <tr><td>FY2026</td><td>Forklift rebuild</td><td class="n">14,000</td></tr>
+          </tbody></table>
+          <p class="quote">Total R&amp;M expense: FY2024 $196K · FY2025 $201K · FY2026 $210K. Both press brakes run two shifts.</p></div>
+        <div class="card"><span class="tag">C5 · Marketing GL + CRM lead-source report</span><h4>Trade shows and lead sources</h4>
+          <table class="mini"><tbody>
+          <tr><td>Trade show spend (4 regional shows): FY2024 / FY2025 / FY2026</td><td class="n">33K / 34K / 35K</td></tr>
+          <tr><td>FY2026 new leads: referrals</td><td class="n">41%</td></tr>
+          <tr><td>FY2026 new leads: website</td><td class="n">24%</td></tr>
+          <tr><td>FY2026 new leads: trade shows</td><td class="n">20%</td></tr>
+          <tr><td>FY2026 new leads: outbound sales</td><td class="n">15%</td></tr>
+          </tbody></table></div>
+        <div class="card"><span class="tag">C6 · Lease agreement + broker opinion letter</span><h4>Facility lease</h4>
+          <table class="mini"><tbody>
+          <tr><td>Landlord</td><td>Summit Properties LLC (members: M. Hansen, D. Ortiz)</td></tr>
+          <tr><td>Tenant</td><td>Summit Manufacturing, Inc.</td></tr>
+          <tr><td>Base rent</td><td>$155,000 / year, unchanged since 2019</td></tr>
+          <tr><td>Term</td><td>Month-to-month</td></tr>
+          </tbody></table>
+          <p class="quote">"Comparable industrial space in the area is currently leasing for approximately $240,000 per year for a building of this size and condition." (Broker opinion of value, Sept. 2026)</p></div>
+        <div class="card"><span class="tag">C7 · Customer revenue report + contract summary</span><h4>Top customers, FY2026</h4>
+          <table class="mini"><tbody>
+          <tr><td>Teton Ag Equipment</td><td class="n">30%</td></tr>
+          <tr><td>Customers #2–#5 (combined)</td><td class="n">28%</td></tr>
+          <tr><td>All other customers (about 140)</td><td class="n">42%</td></tr>
+          </tbody></table>
+          <p class="quote">Teton master supply agreement: effective July 1, 2022; expires June 30, 2027; volumes set by monthly purchase orders. Relationship owner: M. Hansen.</p></div>
+        <div class="card"><span class="tag">C8 · Operations data, Sept 30, 2026</span><h4>Backlog, capacity, people</h4>
+          <table class="mini"><tbody>
+          <tr><td>Backlog (prior year: $3.4M)</td><td class="n">$4.1M</td></tr>
+          <tr><td>Plant utilization</td><td class="n">~80%</td></tr>
+          <tr><td>Employees: production / office &amp; admin</td><td class="n">64 / 22</td></tr>
+          </tbody></table></div>
+      </div>
+    </div>
+
+    <div class="exhibit">
+      <span class="ex-label">Exhibit D</span>
+      <h3>Market valuation data</h3>
+      <div class="grid2">
+        <div>
+          <p>Recent sales of comparable privately held metal fabricators (about $8–25M revenue) traded at <b>5.0x to 7.0x Adjusted EBITDA</b>, with a <b>median of 6.0x</b>. Enterprise value = Adjusted EBITDA × multiple.</p>
+          <p>Where Summit falls in that range is a judgment your team has to support from the data room.</p>
+          <p class="note">Illustrative market data prepared for this case.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th colspan="2">Factors buyers commonly weigh</th></tr></thead>
+            <tbody>
+              <tr><td>Growth rate</td><td>Margin stability</td></tr>
+              <tr><td>Customer diversification</td><td>Depth of management</td></tr>
+              <tr><td>Contract terms and visibility</td><td>End-market cyclicality</td></tr>
+              <tr><td>Backlog</td><td>Capacity and capital needs</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="exhibit">
+      <span class="ex-label">Exhibit E</span>
+      <h3>Net working capital</h3>
+      <div class="grid2">
+        <div>
+          <p><b>Net working capital (NWC)</b> = accounts receivable + inventory − accounts payable − accrued expenses.</p>
+          <p>Buyers expect a "normal" level of working capital to come with the business. The LOI sets a <b>target (or "peg")</b>. If NWC at closing is below the peg, the price goes down dollar for dollar. If it is above, the price goes up.</p>
+          <p>Both offers are <b>cash-free, debt-free</b>. Summit's $1.2M bank term loan is repaid from the sale proceeds under either offer, so it does not change your comparison.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Summit NWC</th><th class="n">Amount</th></tr></thead>
+            <tbody>
+              <tr><td>Trailing 12-month <b>average</b></td><td class="n">1,500,000</td></tr>
+              <tr><td>Low month (December)</td><td class="n">1,320,000</td></tr>
+              <tr><td>High month (April, pre-planting season)</td><td class="n">1,780,000</td></tr>
+              <tr><td>At Sept 30, 2026</td><td class="n">1,560,000</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OFFERS -->
+<section id="offers">
+  <div class="wrap">
+    <span class="ex-label">Exhibit F</span>
+    <h2>The two letters of intent</h2>
+    <p class="lead">Both LOIs are non-binding and assume Adjusted EBITDA of $2.15M per the draft CIM, subject to confirmatory due diligence.</p>
+    <div class="offers" style="margin-top:24px">
+      <article class="offer">
+        <header>
+          <div class="eyebrow">Buyer A · Strategic</div>
+          <h3>Ridgeline Fabrication Group</h3>
+          <div class="head">$12.0M</div>
+          <small>Headline enterprise value</small>
+        </header>
+        <div class="pad">
+          <table>
+            <tbody>
+              <tr><td>Who they are</td><td>A larger Boise-based competitor buying to add capacity and ag customers</td></tr>
+              <tr><td>Cash at closing</td><td class="num"><b>$12.0M</b></td></tr>
+              <tr><td>Seller note</td><td>None</td></tr>
+              <tr><td>Earnout</td><td>None</td></tr>
+              <tr><td>Financing</td><td>Cash on hand. No financing contingency</td></tr>
+              <tr><td>NWC target</td><td class="num">$1,500,000</td></tr>
+              <tr><td>Exclusivity</td><td>45 days. Targeted close in about 60 days</td></tr>
+              <tr><td>Owners after closing</td><td>6-month paid transition, then fully out</td></tr>
+              <tr><td>Employees</td><td>Keeps production staff and the plant. Plans to move accounting, purchasing, and HR to its Boise HQ within 12 months (affects some of the 22 office roles)</td></tr>
+              <tr><td>Facility</td><td>5-year lease with the owners' LLC at market rent</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+      <article class="offer">
+        <header>
+          <div class="eyebrow">Buyer B · Private equity</div>
+          <h3>Granite Peak Capital Partners</h3>
+          <div class="head">$13.5M</div>
+          <small>Headline enterprise value</small>
+        </header>
+        <div class="pad">
+          <table>
+            <tbody>
+              <tr><td>Who they are</td><td>A Salt Lake City private equity fund making its first industrial "platform" acquisition</td></tr>
+              <tr><td>Cash at closing</td><td class="num"><b>$11.0M</b></td></tr>
+              <tr><td>Seller note</td><td class="num">$1.0M at 5% interest, paid annually. Principal due in full at the end of year 3. Subordinated to the bank loan</td></tr>
+              <tr><td>Earnout</td><td class="num">$1.5M, paid at the end of year 2 if Summit's year-2 revenue is ≥ $14.5M (all-or-nothing)</td></tr>
+              <tr><td>Financing</td><td>Subject to bank financing. Term sheet received; no commitment letter yet</td></tr>
+              <tr><td>NWC target</td><td class="num">$1,700,000</td></tr>
+              <tr><td>Exclusivity</td><td>90 days. Targeted close in about 120 days</td></tr>
+              <tr><td>Owners after closing</td><td>Both owners sign 2-year employment agreements at their current compensation ($260,000 each, including benefits)</td></tr>
+              <tr><td>Employees</td><td>Keeps the entire team and plans add-on acquisitions</td></tr>
+              <tr><td>Facility</td><td>5-year lease with the owners' LLC at market rent</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+    <div class="callout" style="margin-top:22px"><b>Deal-team assumptions for Step 4:</b> Discount deferred payments at <b>10%</b> a year. The deal team's base-case estimate is a <b>50% chance</b> the earnout is earned. You can argue for a different probability, but show your reasoning. Use the <b>$1.5M</b> trailing average as the normal level of NWC delivered at closing.</div>
+  </div>
+</section>
+
+<!-- WORKSHEET -->
+<section id="worksheet">
+  <div class="wrap">
+    <div class="eyebrow">Interactive</div>
+    <h2>Team worksheet</h2>
+    <p class="lead">The worksheet does the arithmetic. Your team makes the judgment calls. Your entries are saved in this browser only, so one teammate should run the team's copy.</p>
+
+    <div class="step">
+      <h3><span class="k">STEP 1 · EXHIBIT A-2</span>Rebuild FY2026 reported EBITDA</h3>
+      <p class="hint">EBITDA = Earnings Before Interest, Taxes, Depreciation, and Amortization. Start from net income and add back each item.</p>
+      <div class="row"><label for="s1_ni">Net income</label><input type="number" id="s1_ni" data-k="s1_ni" step="1000" placeholder="0"></div>
+      <div class="row"><label for="s1_i">+ Interest expense</label><input type="number" id="s1_i" data-k="s1_i" step="1000" placeholder="0"></div>
+      <div class="row"><label for="s1_t">+ Income tax expense</label><input type="number" id="s1_t" data-k="s1_t" step="1000" placeholder="0"></div>
+      <div class="row"><label for="s1_d">+ Depreciation</label><input type="number" id="s1_d" data-k="s1_d" step="1000" placeholder="0"></div>
+      <div class="row"><label for="s1_a">+ Amortization</label><input type="number" id="s1_a" data-k="s1_a" step="1000" placeholder="0"></div>
+      <div class="result"><span>Reported EBITDA</span><b id="o_rep">$0</b></div>
+      <p class="note">Check: you should get the same answer starting from operating income. Why?</p>
+    </div>
+
+    <div class="step">
+      <h3><span class="k">STEP 2 · EXHIBITS B &amp; C</span>Quality of earnings: adjusted EBITDA</h3>
+      <p class="hint">Accept or reject each add-back management proposed. Record any other adjustments your team supports, positive or negative. Be ready to defend every call with a document from the data room.</p>
+      <div id="adjList"></div>
+      <p style="margin:18px 0 4px; font-weight:600; color:var(--navy)">Other adjustments (if any)</p>
+      <div class="custom"><input type="text" class="desc" data-k="c1d" placeholder="Description and supporting document"><input type="number" data-k="c1v" step="1000" placeholder="± amount"></div>
+      <div class="custom"><input type="text" class="desc" data-k="c2d" placeholder="Description"><input type="number" data-k="c2v" step="1000" placeholder="± amount"></div>
+      <div class="custom"><input type="text" class="desc" data-k="c3d" placeholder="Description"><input type="number" data-k="c3v" step="1000" placeholder="± amount"></div>
+      <div class="result"><span>Your adjusted EBITDA</span><b id="o_adj">$0</b></div>
+      <p class="note" id="o_gap"></p>
+      <textarea data-k="byBuyer" placeholder="Does your adjusted EBITDA hold the same way under both buyers' terms? Explain." style="margin-top:8px"></textarea>
+    </div>
+
+    <div class="step">
+      <h3><span class="k">STEP 3 · EXHIBIT D</span>Valuation</h3>
+      <p class="hint">Choose the multiple you can defend. Name at least two factors that push Summit above or below the 6.0x median.</p>
+      <div class="grid2" style="align-items:center">
+        <div>
+          <label for="mult" style="font-size:.9rem; color:var(--muted)">Your EBITDA multiple</label>
+          <div class="mult-big"><span id="o_mult">6.00</span>x</div>
+          <input type="range" class="slider" id="mult" data-k="mult" min="4" max="8" step="0.25" value="6">
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Multiple</th><th class="n">Enterprise value</th></tr></thead>
+            <tbody id="o_range"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="result"><span>Your enterprise value</span><b id="o_ev">$0</b></div>
+      <textarea data-k="multWhy" placeholder="Why this multiple? (e.g., growth and backlog vs. Teton concentration...)" style="margin-top:14px"></textarea>
+    </div>
+
+    <div class="step">
+      <h3><span class="k">STEP 4 · EXHIBITS E &amp; F</span>What is each offer really worth today?</h3>
+      <p class="hint">Deferred and uncertain payments are worth less than cash at closing. Change the assumptions to test how sensitive your answer is.</p>
+      <div class="grid3" style="margin-bottom:14px">
+        <div><label for="dr" style="font-size:.88rem; color:var(--muted)">Discount rate (%)</label><input type="number" id="dr" data-k="dr" value="10" step="0.5"></div>
+        <div><label for="prob" style="font-size:.88rem; color:var(--muted)">Earnout probability: <b id="o_prob">50</b>%</label><input type="range" class="slider" id="prob" data-k="prob" min="0" max="100" step="5" value="50"></div>
+        <div><label for="nwc" style="font-size:.88rem; color:var(--muted)">NWC delivered at close ($)</label><input type="number" id="nwc" data-k="nwc" value="1500000" step="10000"></div>
+      </div>
+      <div class="grid3" style="margin-bottom:14px">
+        <div><label for="acash" style="font-size:.88rem; color:var(--muted)">Buyer A cash at closing ($)</label><input type="number" id="acash" data-k="acash" value="12000000" step="50000"></div>
+        <div><label for="bcash" style="font-size:.88rem; color:var(--muted)">Buyer B cash at closing ($)</label><input type="number" id="bcash" data-k="bcash" value="11000000" step="50000"></div>
+        <div><p class="note" style="margin-top:22px">Update these if terms change during the evening.</p></div>
+      </div>
+      <div class="table-wrap">
+        <table class="cmp">
+          <thead><tr><th>Component</th><th class="n">Buyer A · Ridgeline</th><th class="n">Buyer B · Granite Peak</th></tr></thead>
+          <tbody>
+            <tr><td>Headline value</td><td class="n" id="a_head"></td><td class="n" id="b_head"></td></tr>
+            <tr><td>Cash at closing</td><td class="n" id="a_cash"></td><td class="n" id="b_cash"></td></tr>
+            <tr><td>Present value of seller note (interest + principal)</td><td class="n" id="a_note"></td><td class="n" id="b_note"></td></tr>
+            <tr><td>Present value of earnout (probability × payout, discounted)</td><td class="n" id="a_earn"></td><td class="n" id="b_earn"></td></tr>
+            <tr><td>Working capital adjustment (NWC delivered − target)</td><td class="n" id="a_nwc"></td><td class="n" id="b_nwc"></td></tr>
+            <tr class="total"><td>Risk-adjusted value today</td><td class="n" id="a_tot"></td><td class="n" id="b_tot"></td></tr>
+            <tr><td>Implied multiple of <em>your</em> adjusted EBITDA</td><td class="n" id="a_mx"></td><td class="n" id="b_mx"></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">This table prices only what can be quantified. Everything else is for your team to weigh.</p>
+      <textarea data-k="rec" placeholder="Our recommendation: which buyer, and the 2–3 terms we'd negotiate..." style="margin-top:8px"></textarea>
+      <textarea data-k="risks" placeholder="Top risks to value or to closing, and how to handle each..." style="margin-top:10px"></textarea>
+    </div>
+
+    <div class="btns">
+      <button class="btn" id="copyBtn" type="button">Copy team summary</button>
+      <button class="btn ghost" id="resetBtn" type="button">Reset worksheet</button>
+      <span class="toast" id="toast" role="status"></span>
+    </div>
+  </div>
+</section>
+
+<!-- JUDGING -->
+<section id="judging">
+  <div class="wrap grid2">
+    <div>
+      <div class="eyebrow">How you'll be scored</div>
+      <h2>Judging criteria</h2>
+      <p class="lead">Hemming Morse professionals score every team on the same 100-point rubric. There is more than one defensible recommendation. Judges reward <b>sound reasoning backed by the exhibits</b>, not a single "right" answer.</p>
+      <p>Expect at least one tough question, such as:</p>
+      <ul>
+        <li>Why shouldn't we just take the highest offer?</li>
+        <li>Which document supports that adjustment?</li>
+        <li>What does the update change, and what doesn't it change?</li>
+        <li>What would make you walk away from this deal?</li>
+      </ul>
+    </div>
+    <div class="table-wrap" style="align-self:start">
+      <table>
+        <thead><tr><th>Category</th><th class="n">Points</th></tr></thead>
+        <tbody>
+          <tr><td>EBITDA calculation and adjustments</td><td class="n">25</td></tr>
+          <tr><td>Valuation methodology</td><td class="n">20</td></tr>
+          <tr><td>Acquisition offer evaluation</td><td class="n">20</td></tr>
+          <tr><td>Financial risk identification</td><td class="n">15</td></tr>
+          <tr><td>Negotiation strategy</td><td class="n">10</td></tr>
+          <tr><td>Presentation and professionalism</td><td class="n">10</td></tr>
+          <tr class="total"><td>Total</td><td class="n">100</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- GLOSSARY -->
+<section id="glossary">
+  <div class="wrap">
+    <div class="eyebrow">Quick reference</div>
+    <h2>M&amp;A glossary</h2>
+    <div class="gloss" style="margin-top:16px">
+      <div><b>Sell-side advisor</b><p>The firm hired by the <em>seller</em> to run the sale process and get the best outcome. That is your team tonight.</p></div>
+      <div><b>EBITDA</b><p>Earnings before interest, taxes, depreciation, and amortization. A rough measure of operating cash earnings that ignores how the company is financed.</p></div>
+      <div><b>Add-back / adjustment</b><p>An expense removed from EBITDA because it will not continue under a new owner (owner perks, one-time costs). Adjustments can also go the other way: a cost a new owner will <em>have</em> to pay lowers EBITDA.</p></div>
+      <div><b>Quality of Earnings (QoE)</b><p>A diligence review that tests whether reported earnings are real, recurring, and sustainable. Buyers always run their own.</p></div>
+      <div><b>Enterprise value (EV)</b><p>The value of the whole business before debt and cash. In small deals, EV is usually Adjusted EBITDA × a market multiple.</p></div>
+      <div><b>Multiple</b><p>How many years of EBITDA a buyer will pay. A higher multiple means lower perceived risk or stronger growth.</p></div>
+      <div><b>CIM</b><p>Confidential Information Memorandum. The detailed marketing document buyers receive after signing an NDA.</p></div>
+      <div><b>LOI</b><p>Letter of Intent. A mostly non-binding offer setting out price and key terms, usually with an exclusivity period.</p></div>
+      <div><b>Exclusivity</b><p>A period when the seller agrees not to negotiate with other buyers. Longer exclusivity shifts leverage to the buyer.</p></div>
+      <div><b>Re-trade</b><p>When a buyer lowers its offered price after receiving more information, often citing diligence findings.</p></div>
+      <div><b>Earnout</b><p>Part of the price paid later <em>only if</em> the business hits targets. It bridges a valuation gap but shifts risk to the seller.</p></div>
+      <div><b>Seller note</b><p>The seller lends part of the price to the buyer, who repays it over time. If it is subordinated, the bank gets paid first.</p></div>
+      <div><b>NWC peg</b><p>The target net working capital the buyer expects at closing. The price moves up or down by the difference.</p></div>
+      <div><b>Cash-free, debt-free</b><p>The seller keeps the cash and pays off the debt at closing, so EV converts to the seller's proceeds the same way in both offers.</p></div>
+      <div><b>Customer concentration</b><p>Dependence on a few large customers. Losing one could sharply cut earnings, so buyers apply a discount.</p></div>
+      <div><b>Present value</b><p>What a future payment is worth today: payment ÷ (1 + rate)<sup>years</sup>.</p></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">Project Summit is a fictional case prepared for the BYU–Idaho Student Accounting Society M&amp;A Case Challenge, November 12, 2026. Summit Manufacturing, Ridgeline Fabrication Group, Granite Peak Capital Partners, and all individuals and figures in this case are fictional and for educational use only.</div>
+</footer>
+
+<script>
+(function(){
+  var KEY = "project-summit-ws-v1";
+  var ADJ = [
+    {id:"b1", label:"B1 · Excess owner compensation", amt:120000},
+    {id:"b2", label:"B2 · Hollis lawsuit legal fees", amt:40000},
+    {id:"b3", label:"B3 · Owners' personal travel", amt:25000},
+    {id:"b4", label:"B4 · Press brake overhaul", amt:30000},
+    {id:"b5", label:"B5 · Trade show costs", amt:35000}
+  ];
+  var state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch(e){ state = {}; }
+  function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
+
+  var usd = new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0});
+  function $(id){ return document.getElementById(id); }
+  function num(v){ var n = parseFloat(v); return isFinite(n) ? n : 0; }
+  function fmt(n){ return n < 0 ? "(" + usd.format(-n) + ")" : usd.format(n); }
+
+  // build adjustment rows
+  var list = $("adjList");
+  ADJ.forEach(function(a){
+    var row = document.createElement("div");
+    row.className = "adj";
+    row.innerHTML = '<span>' + a.label + '</span><span class="num" style="text-align:right">' + usd.format(a.amt) +
+      '</span><span class="seg" role="group" aria-label="' + a.label + '"><button type="button" class="acc" data-adj="' + a.id + '" data-v="acc">Accept</button><button type="button" class="rej" data-adj="' + a.id + '" data-v="rej">Reject</button></span>';
+    list.appendChild(row);
+  });
+  list.addEventListener("click", function(e){
+    var b = e.target.closest("button[data-adj]"); if(!b) return;
+    var k = "adj_" + b.getAttribute("data-adj");
+    state[k] = state[k] === b.getAttribute("data-v") ? "" : b.getAttribute("data-v");
+    save(); render();
+  });
+
+  // restore + bind inputs
+  var fields = document.querySelectorAll("[data-k]");
+  fields.forEach(function(el){
+    var k = el.getAttribute("data-k");
+    if (state[k] !== undefined && state[k] !== null) el.value = state[k];
+    el.addEventListener("input", function(){ state[k] = el.value; save(); render(); });
+  });
+
+  function render(){
+    var rep = num(state.s1_ni) + num(state.s1_i) + num(state.s1_t) + num(state.s1_d) + num(state.s1_a);
+    $("o_rep").textContent = fmt(rep);
+
+    var adj = rep, acc = 0, undecided = 0;
+    ADJ.forEach(function(a){
+      var v = state["adj_" + a.id] || "";
+      if (v === "acc") { adj += a.amt; acc += a.amt; }
+      if (!v) undecided++;
+      document.querySelectorAll('button[data-adj="' + a.id + '"]').forEach(function(b){
+        b.classList.toggle("on", b.getAttribute("data-v") === v);
+        b.setAttribute("aria-pressed", b.getAttribute("data-v") === v ? "true" : "false");
+      });
+    });
+    adj += num(state.c1v) + num(state.c2v) + num(state.c3v);
+    $("o_adj").textContent = fmt(adj);
+    var gap = 2150000 - adj;
+    $("o_gap").textContent = rep === 0 ? "Complete Step 1 first." :
+      (undecided ? undecided + " add-back(s) still undecided. " : "") +
+      "Management's CIM figure: $2,150,000. Difference from yours: " + fmt(gap) + ".";
+
+    var m = num(state.mult || 6);
+    $("o_mult").textContent = m.toFixed(2);
+    $("o_ev").textContent = fmt(adj * m);
+    $("o_range").innerHTML = [5,6,7].map(function(x){
+      return "<tr><td>" + x.toFixed(1) + "x</td><td class='n'>" + fmt(adj * x) + "</td></tr>";
+    }).join("");
+
+    var r = num(state.dr === undefined ? 10 : state.dr) / 100;
+    var p = num(state.prob === undefined ? 50 : state.prob) / 100;
+    var nwc = num(state.nwc === undefined ? 1500000 : state.nwc);
+    $("o_prob").textContent = Math.round(p * 100);
+    var d1 = 1 + r, d2 = d1 * d1, d3 = d2 * d1;
+    var noteB = 50000 / d1 + 50000 / d2 + 1050000 / d3;
+    var earnB = p * 1500000 / d2;
+    var nwcA = nwc - 1500000, nwcB = nwc - 1700000;
+    var aCash = num(state.acash === undefined || state.acash === "" ? 12000000 : state.acash);
+    var bCash = num(state.bcash === undefined || state.bcash === "" ? 11000000 : state.bcash);
+    var totA = aCash + nwcA;
+    var totB = bCash + noteB + earnB + nwcB;
+    $("a_head").textContent = fmt(aCash); $("b_head").textContent = fmt(bCash + 2500000);
+    $("a_cash").textContent = fmt(aCash); $("b_cash").textContent = fmt(bCash);
+    $("a_note").textContent = "—"; $("b_note").textContent = fmt(noteB);
+    $("a_earn").textContent = "—"; $("b_earn").textContent = fmt(earnB);
+    $("a_nwc").textContent = fmt(nwcA); $("b_nwc").textContent = fmt(nwcB);
+    $("a_tot").textContent = fmt(totA); $("b_tot").textContent = fmt(totB);
+    $("a_mx").textContent = adj > 0 ? (totA / adj).toFixed(2) + "x" : "—";
+    $("b_mx").textContent = adj > 0 ? (totB / adj).toFixed(2) + "x" : "—";
+
+    render.summary = [
+      "PROJECT SUMMIT — TEAM SUMMARY",
+      "Reported EBITDA: " + fmt(rep),
+      "Add-backs accepted: " + ADJ.filter(function(a){return state["adj_"+a.id]==="acc";}).map(function(a){return a.id.toUpperCase();}).join(", ") + " (" + fmt(acc) + ")",
+      "Add-backs rejected: " + ADJ.filter(function(a){return state["adj_"+a.id]==="rej";}).map(function(a){return a.id.toUpperCase();}).join(", "),
+      [1,2,3].map(function(i){ return num(state["c"+i+"v"]) ? "Other adjustment: " + (state["c"+i+"d"]||"(unlabeled)") + " " + fmt(num(state["c"+i+"v"])) : ""; }).filter(Boolean).join("\n"),
+      "Adjusted EBITDA: " + fmt(adj),
+      "Multiple: " + m.toFixed(2) + "x  ->  Enterprise value: " + fmt(adj * m),
+      "Why: " + (state.multWhy || ""),
+      "EBITDA under each buyer: " + (state.byBuyer || ""),
+      "Buyer A risk-adjusted value: " + fmt(totA) + "  (cash at close " + fmt(aCash) + ")",
+      "Buyer B risk-adjusted value: " + fmt(totB) + "  (discount " + (r*100) + "%, earnout prob " + Math.round(p*100) + "%)",
+      "Recommendation: " + (state.rec || ""),
+      "Key risks: " + (state.risks || "")
+    ].filter(Boolean).join("\n");
+  }
+
+  $("copyBtn").addEventListener("click", function(){
+    var t = $("toast");
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(render.summary).then(function(){ t.textContent = "Copied. Paste it into your slides or notes."; },
+        function(){ t.textContent = "Copy was blocked. Select the results manually."; });
+    } else { t.textContent = "Copy isn't available here."; }
+    setTimeout(function(){ t.textContent = ""; }, 4000);
+  });
+
+  var armed = false;
+  $("resetBtn").addEventListener("click", function(){
+    var b = $("resetBtn");
+    if (!armed) { armed = true; b.textContent = "Click again to confirm reset"; setTimeout(function(){ armed = false; b.textContent = "Reset worksheet"; }, 3500); return; }
+    state = {}; save();
+    fields.forEach(function(el){
+      var k = el.getAttribute("data-k");
+      el.value = k === "mult" ? 6 : k === "dr" ? 10 : k === "prob" ? 50 : k === "nwc" ? 1500000 : k === "acash" ? 12000000 : k === "bcash" ? 11000000 : "";
+    });
+    armed = false; b.textContent = "Reset worksheet"; render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
