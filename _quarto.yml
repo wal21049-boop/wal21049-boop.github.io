@@ -4,6 +4,7 @@ project:
     - larkspur-case/index.html
     - prospecting-portfolio/index.html
     - project-summit/index.html
+    - project-summit/Project-Summit-Workbook.xlsx
 
 website:
   title: "Your_Name - Data Science Portfolio"

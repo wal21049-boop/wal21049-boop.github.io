@@ -142,6 +142,9 @@
   .toast{font-size:.88rem; color:var(--green); align-self:center}
   textarea{font:inherit; width:100%; min-height:72px; padding:10px; border:1px solid #c9c2b4; border-radius:6px; background:#fffdf9; resize:vertical}
 
+  .dl{display:inline-flex; align-items:center; gap:8px; background:#fff; color:var(--navy); font-weight:600; text-decoration:none; padding:11px 18px; border-radius:8px; margin-top:26px; position:relative; z-index:1}
+  .dl:hover{background:var(--copper-soft)}
+  .dl.alt{background:var(--copper); color:#fff; margin-top:6px}
   .callout{border-left:4px solid var(--copper); background:var(--copper-soft); padding:14px 18px; border-radius:0 8px 8px 0; margin:18px 0; font-size:.95rem}
   .gloss{display:grid; grid-template-columns:1fr 1fr; gap:0 32px}
   .gloss div{padding:12px 0; border-bottom:1px solid var(--line)}
@@ -159,7 +162,7 @@
     .memo{padding:22px 20px}
   }
   @media print{
-    nav.top,.btns,#worksheet .slider{display:none}
+    nav.top,.btns,#worksheet .slider,.dl{display:none}
     body{background:#fff; font-size:11pt}
     header.hero{background:#fff; color:#000; padding:20px 0}
     header.hero h1,header.hero .sub,.hero-meta b{color:#000}
@@ -201,6 +204,7 @@
       <div>Presentations <b>7:45 PM</b></div>
       <div>Teams of <b>3–5</b></div>
     </div>
+    <a class="dl" href="https://wal21049-boop.github.io/project-summit/Project-Summit-Workbook.xlsx">⬇ Download the Excel workbook</a>
     <div class="hero-q">
       <div><span>Q1</span><strong>What does Summit really earn? (Adjusted EBITDA)</strong></div>
       <div><span>Q2</span><strong>What is the company worth?</strong></div>
@@ -577,7 +581,8 @@
   <div class="wrap">
     <div class="eyebrow">Interactive</div>
     <h2>Team worksheet</h2>
-    <p class="lead">The worksheet does the arithmetic. Your team makes the judgment calls. Your entries are saved in this browser only, so one teammate should run the team's copy.</p>
+    <p class="lead">The worksheet does the arithmetic. Your team makes the judgment calls. Your entries are saved in this browser only, so one teammate should run the team's copy. Prefer Excel? The workbook has every exhibit and the same four steps with live formulas.</p>
+    <a class="dl alt" href="https://wal21049-boop.github.io/project-summit/Project-Summit-Workbook.xlsx">⬇ Download the Excel workbook</a>
 
     <div class="step">
       <h3><span class="k">STEP 1 · EXHIBIT A-2</span>Rebuild FY2026 reported EBITDA</h3>
